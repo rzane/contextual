@@ -1,18 +1,6 @@
 defmodule Contextual do
-  @moduledoc """
-  Documentation for Contextual.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Contextual.hello
-      :world
-
-  """
-  def hello do
-    :world
+  defmacro __using__(_) do
+    quote do
+    end
   end
 end
