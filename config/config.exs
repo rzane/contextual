@@ -2,6 +2,8 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :logger, level: :info
+
 config :contextual, Contextual.Test.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "contextual_test",
