@@ -2,7 +2,9 @@ defmodule Contextual do
   defmacro __using__(opts) do
     opts = Keyword.put_new(opts, :name_generator, {__MODULE__, :generate_name})
 
-    quote location: :keep, bind_quoted: [opts: opts] do
+    {name, _plural} = Keyword.get(opts, :name)
+
+    quote location: :keep, bind_quoted: [opts: opts, name: name] do
       @__repo__ Keyword.fetch!(opts, :repo)
       @__schema__ Keyword.fetch!(opts, :schema)
 
@@ -16,6 +18,7 @@ defmodule Contextual do
             [%#{inspect(@__schema__)}{}, %#{inspect(@__schema__)}{}, ...]
 
         """
+        @spec unquote(name)(Ecto.Queryable.t()) :: [%unquote(@__schema__){}]
         def unquote(name)(queryable \\ @__schema__) do
           Contextual.API.list(@__repo__, queryable)
         end
@@ -36,6 +39,7 @@ defmodule Contextual do
             nil
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), term) :: %unquote(@__schema__){} | nil
         def unquote(name)(queryable \\ @__schema__, id) do
           Contextual.API.get(@__repo__, queryable, id)
         end
@@ -56,6 +60,7 @@ defmodule Contextual do
             ** (Ecto.NoResultsError)
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), term) :: %unquote(@__schema__){} | no_return
         def unquote(name)(queryable \\ @__schema__, id) do
           Contextual.API.get!(@__repo__, queryable, id)
         end
@@ -76,6 +81,7 @@ defmodule Contextual do
             nil
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), list()) :: %unquote(@__schema__){} | nil
         def unquote(name)(queryable \\ @__schema__, clauses) do
           Contextual.API.get_by(@__repo__, queryable, clauses)
         end
@@ -96,6 +102,7 @@ defmodule Contextual do
             ** (Ecto.NoResultsError)
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), list()) :: %unquote(@__schema__){} | no_return()
         def unquote(name)(queryable \\ @__schema__, clauses) do
           Contextual.API.get_by!(@__repo__, queryable, clauses)
         end
@@ -118,6 +125,7 @@ defmodule Contextual do
             :error
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), term) :: {:ok, %unquote(@__schema__){}} | :error
         def unquote(name)(queryable \\ @__schema__, id) do
           Contextual.API.fetch(@__repo__, queryable, id)
         end
@@ -140,6 +148,7 @@ defmodule Contextual do
             :error
 
         """
+        @spec unquote(name)(Ecto.Queryable.t(), list()) :: {:ok, %unquote(@__schema__){}} | :error
         def unquote(name)(queryable \\ @__schema__, clauses) do
           Contextual.API.fetch_by(@__repo__, queryable, clauses)
         end
@@ -147,35 +156,48 @@ defmodule Contextual do
 
       Contextual.define(opts, :change, fn name ->
         @doc """
+        See the documentation for `#{name}/2`.
+        """
+        @spec unquote(name)() :: Ecto.Changeset.t()
+        def unquote(name)() do
+          Contextual.API.change(@__schema__, struct(@__schema__), %{})
+        end
+
+        @doc """
+        See the documentation for `#{name}/2`.
+        """
+        @spec unquote(name)(%unquote(@__schema__){}) :: Ecto.Changeset.t()
+        def unquote(name)(%@__schema__{} = resource) do
+          Contextual.API.change(@__schema__, resource, %{})
+        end
+
+        @doc """
+        See the documentation for `#{name}/2`.
+        """
+        @spec unquote(name)(map) :: Ecto.Changeset.t()
+        def unquote(name)(attributes) when is_map(attributes) do
+          Contextual.API.change(@__schema__, struct(@__schema__), attributes)
+        end
+
+        @doc """
         Create an `Ecto.Changeset` for a `#{inspect(@__schema__)}`.
 
         ## Examples
 
             iex> #{name}()
-            %Ecto.Changeset{}
+            %Ecto.Changeset{data: %#{inspect(@__schema__)}{}, changes: %{}}
 
             iex> #{name}(%{title: "Meatloaf"})
-            %Ecto.Changeset{}
+            %Ecto.Changeset{data: %#{inspect(@__schema__)}{}, changes: %{title: "Meatloaf"}}
 
-            iex> #{name}(%#{inspect(@__schema__)}{})
-            %Ecto.Changeset{}
+            iex> #{name}(%#{inspect(@__schema__)}{title: "Lobster"})
+            %Ecto.Changeset{data: %#{inspect(@__schema__)}{title: "Lobster"}, changes: %{}}
 
-            iex> #{name}(%#{inspect(@__schema__)}{}, %{title: "Meatloaf"})
-            %Ecto.Changeset{}
+            iex> #{name}(%#{inspect(@__schema__)}{title: "Lobster"}, %{title: "Meatloaf"})
+            %Ecto.Changeset{data: %#{inspect(@__schema__)}{title: "Lobster"}, changes: %{title: "Meatloaf"}}
 
         """
-        def unquote(name)() do
-          Contextual.API.change(@__schema__, struct(@__schema__), %{})
-        end
-
-        def unquote(name)(%@__schema__{} = resource) do
-          Contextual.API.change(@__schema__, resource, %{})
-        end
-
-        def unquote(name)(attributes) when is_map(attributes) do
-          Contextual.API.change(@__schema__, struct(@__schema__), attributes)
-        end
-
+        @spec unquote(name)(%unquote(@__schema__){}, map) :: Ecto.Changeset.t()
         def unquote(name)(%__schema__{} = resource, attributes) when is_map(attributes) do
           Contextual.API.change(@__schema__, resource, attributes)
         end
@@ -196,6 +218,7 @@ defmodule Contextual do
             {:error, %Ecto.Changeset{}}
 
         """
+        @spec unquote(name)(map) :: {:ok, %unquote(@__schema__){}} | {:error, Ecto.Changeset.t()}
         def unquote(name)(attributes \\ %{}) do
           Contextual.API.create(@__repo__, @__schema__, attributes)
         end
@@ -216,6 +239,7 @@ defmodule Contextual do
             ** (Ecto.InvalidChangesetError)
 
         """
+        @spec unquote(name)(map) :: %unquote(@__schema__){} | no_return
         def unquote(name)(attributes \\ %{}) do
           Contextual.API.create!(@__repo__, @__schema__, attributes)
         end
@@ -236,6 +260,8 @@ defmodule Contextual do
             {:error, %Ecto.Changeset{}}
 
         """
+        @spec unquote(name)(%unquote(@__schema__){}, map) ::
+                {:ok, %unquote(@__schema__){}} | {:error, Ecto.Changeset.t()}
         def unquote(name)(resource, attributes \\ %{}) do
           Contextual.API.update(@__repo__, @__schema__, resource, attributes)
         end
@@ -256,6 +282,7 @@ defmodule Contextual do
             ** (Ecto.InvalidChangesetError)
 
         """
+        @spec unquote(name)(%unquote(@__schema__){}, map) :: %unquote(@__schema__){} | no_return
         def unquote(name)(resource, attributes \\ %{}) do
           Contextual.API.update!(@__repo__, @__schema__, resource, attributes)
         end
@@ -276,6 +303,8 @@ defmodule Contextual do
             {:error, %Ecto.Changeset{}}
 
         """
+        @spec unquote(name)(%unquote(@__schema__){}) ::
+                {:ok, %unquote(@__schema__){}} | {:error, Ecto.Changeset.t()}
         def unquote(name)(resource) do
           Contextual.API.delete(@__repo__, resource)
         end
@@ -296,6 +325,7 @@ defmodule Contextual do
             ** (Ecto.InvalidChangesetError)
 
         """
+        @spec unquote(name)(%unquote(@__schema__){}) :: %unquote(@__schema__){} | no_return
         def unquote(name)(resource) do
           Contextual.API.delete!(@__repo__, resource)
         end
