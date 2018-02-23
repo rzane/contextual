@@ -38,20 +38,44 @@ end
 
 `MyApp.Posts` now has the following functions:
 
-* `list_posts`
-* `get_post`
-* `get_post!`
-* `get_post_by`
-* `get_post_by!`
-* `fetch_post`
-* `fetch_post_by`
-* `change_post`
-* `create_post`
-* `create_post!`
-* `update_post`
-* `update_post!`
-* `delete_post`
-* `delete_post!`
+```elixir
+alias MyApp.Posts
+alias MyApp.Posts.Post
+
+import Ecto.Query
+
+# List a collection
+posts = Posts.list_posts()
+posts = Posts.list_posts(from(p in Post, where: p.title == "Meatloaf"))
+
+# Get a record by ID
+post = Posts.get_post(19)
+post = Posts.get_post!(19)
+{:ok, post} = Posts.fetch_post(19)
+
+# Get a record by attributes
+post = Posts.get_post_by(title: "Meatloaf")
+post = Posts.get_post_by!(title: "Meatloaf")
+{:ok, post} = Posts.fetch_post_by(title: "Meatloaf")
+
+# Create a changeset for a given post
+changeset = Posts.change_post()
+changeset = Posts.change_post(post)
+changeset = Posts.change_post(%{title: "Meatloaf"})
+changeset = Posts.change_post(post, %{title: "Meatloaf"})
+
+# Create a post
+{:ok, post} = Posts.create_post(%{title: "Meatloaf"})
+post = Posts.create_post!(%{title: "Meatloaf"})
+
+# Update a post
+{:ok, post} = Posts.update_post(post, %{title: "Meatloaf"})
+post = Posts.update_post!(post, %{title: "Meatloaf"})
+
+# Delete a post
+{:ok, post} = Posts.delete_post(post)
+post = Posts.delete_post!(post)
+```
 
 ## Need to choose which functions are generated?
 
