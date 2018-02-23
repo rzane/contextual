@@ -1,0 +1,20 @@
+language: elixir
+
+cache:
+  directories:
+    - $HOME/.mix
+
+elixir:
+  - 1.6.1
+
+otp_release:
+  - 20.1
+
+env:
+  - MIX_ENV=test
+
+script:
+  - mix compile --force --warnings-as-errors
+  - mix format --check-formatted
+  - mix do ecto.create, ecto.migrate
+  - mix test
