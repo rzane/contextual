@@ -127,6 +127,18 @@ end
 
 Now, you'll have `all_posts` instead of `list_posts` and `find_post` instead of `get_post`.
 
+## I'm getting typespec errors
+
+Contextual's typespecs expect your schema to have a type `t` defined. To get the typespecs
+working properly, you'll need to define that type on your schema.
+
+```elixir
+defmodule MyApp.Posts.Post do
+  # ...
+  @type t :: %__MODULE__{}
+end
+```
+
 ## Contributing
 
 The tests run against PostgreSQL. The `test` command will setup a test database for you.

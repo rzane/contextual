@@ -1,10 +1,8 @@
 defmodule Contextual do
   defmacro __using__(opts) do
-    opts = Keyword.put_new(opts, :name_generator, {__MODULE__, :generate_name})
+    opts = Contextual.Config.with_defaults(opts)
 
-    {name, _plural} = Keyword.get(opts, :name)
-
-    quote location: :keep, bind_quoted: [opts: opts, name: name] do
+    quote location: :keep, bind_quoted: [opts: opts] do
       @__repo__ Keyword.fetch!(opts, :repo)
       @__schema__ Keyword.fetch!(opts, :schema)
 
@@ -336,49 +334,9 @@ defmodule Contextual do
   @doc false
   defmacro define(opts, key, fun) do
     quote bind_quoted: [opts: opts, key: key, fun: fun] do
-      if Contextual.enabled?(opts, key) do
-        fun.(Contextual.get_name(opts, key))
+      if Contextual.Config.enabled?(opts, key) do
+        fun.(Contextual.Config.get_name(opts, key))
       end
     end
   end
-
-  @doc false
-  def enabled?(opts, key) do
-    cond do
-      opts[:only] ->
-        key in opts[:only]
-
-      opts[:except] ->
-        key not in opts[:except]
-
-      true ->
-        true
-    end
-  end
-
-  @doc false
-  def get_name(opts, key) do
-    {mod, fun} = Keyword.fetch!(opts, :name_generator)
-    name_config = Keyword.fetch!(opts, :name)
-
-    with :default <- apply(mod, fun, [key, name_config]) do
-      generate_name(key, name_config)
-    end
-  end
-
-  @doc false
-  def generate_name(:list, {_, name}), do: :"list_#{name}"
-  def generate_name(:get, {name, _}), do: :"get_#{name}"
-  def generate_name(:get!, {name, _}), do: :"get_#{name}!"
-  def generate_name(:get_by, {name, _}), do: :"get_#{name}_by"
-  def generate_name(:get_by!, {name, _}), do: :"get_#{name}_by!"
-  def generate_name(:fetch, {name, _}), do: :"fetch_#{name}"
-  def generate_name(:fetch_by, {name, _}), do: :"fetch_#{name}_by"
-  def generate_name(:change, {name, _}), do: :"change_#{name}"
-  def generate_name(:create, {name, _}), do: :"create_#{name}"
-  def generate_name(:create!, {name, _}), do: :"create_#{name}!"
-  def generate_name(:update, {name, _}), do: :"update_#{name}"
-  def generate_name(:update!, {name, _}), do: :"update_#{name}!"
-  def generate_name(:delete, {name, _}), do: :"delete_#{name}"
-  def generate_name(:delete!, {name, _}), do: :"delete_#{name}!"
 end
