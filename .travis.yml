@@ -18,3 +18,4 @@ script:
   - mix format --check-formatted
   - mix do ecto.create, ecto.migrate
   - mix test
+  - mix dialyzer --halt-exit-status
