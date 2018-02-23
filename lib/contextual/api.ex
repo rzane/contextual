@@ -11,12 +11,12 @@ defmodule Contextual.API do
     repo.get!(queryable, id)
   end
 
-  def get_by(repo, queryable, opts) do
-    repo.get_by(queryable, opts)
+  def get_by(repo, queryable, clauses) do
+    repo.get_by(queryable, clauses)
   end
 
-  def get_by!(repo, queryable, opts) do
-    repo.get_by!(queryable, opts)
+  def get_by!(repo, queryable, clauses) do
+    repo.get_by!(queryable, clauses)
   end
 
   def fetch(repo, queryable, id) do
@@ -29,8 +29,8 @@ defmodule Contextual.API do
     end
   end
 
-  def fetch_by(repo, queryable, opts) do
-    case repo.get_by(queryable, opts) do
+  def fetch_by(repo, queryable, clauses) do
+    case repo.get_by(queryable, clauses) do
       nil ->
         :error
 

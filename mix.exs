@@ -26,7 +26,8 @@ defmodule Contextual.MixProject do
   defp deps do
     [
       {:ecto, "~> 2.1"},
-      {:postgrex, ">= 0.0.0", only: [:dev, :test]}
+      {:postgrex, ">= 0.0.0", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: [:dev, :test]}
     ]
   end
 end
