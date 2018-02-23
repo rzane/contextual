@@ -27,54 +27,67 @@ defmodule Contextual do
       def unquote(actions[:list][:name])(queryable \\ @schema) do
         Contextual.API.list(@repo, queryable)
       end
+      defoverridable unquote(actions[:list][:fns])
 
       def unquote(actions[:get][:name])(queryable \\ @schema, id) do
         Contextual.API.get(@repo, queryable, id)
       end
+      defoverridable unquote(actions[:get][:fns])
 
       def unquote(actions[:get!][:name])(queryable \\ @schema, id) do
         Contextual.API.get!(@repo, queryable, id)
       end
+      defoverridable unquote(actions[:get!][:fns])
 
       def unquote(actions[:get_by][:name])(queryable \\ @schema, opts) do
         Contextual.API.get_by(@repo, queryable, opts)
       end
+      defoverridable unquote(actions[:get_by][:fns])
 
       def unquote(actions[:get_by!][:name])(queryable \\ @schema, opts) do
         Contextual.API.get_by!(@repo, queryable, opts)
       end
+      defoverridable unquote(actions[:get_by!][:fns])
 
       def unquote(actions[:fetch][:name])(queryable \\ @schema, id) do
         Contextual.API.fetch(@repo, queryable, id)
       end
+      defoverridable unquote(actions[:fetch][:fns])
 
       def unquote(actions[:fetch_by][:name])(queryable \\ @schema, opts) do
         Contextual.API.fetch_by(@repo, queryable, opts)
       end
+      defoverridable unquote(actions[:fetch_by][:fns])
 
       def unquote(actions[:create][:name])(attributes \\ %{}) do
         Contextual.API.create(@repo, @schema, attributes)
       end
+      defoverridable unquote(actions[:create][:fns])
 
       def unquote(actions[:create!][:name])(attributes \\ %{}) do
         Contextual.API.create!(@repo, @schema, attributes)
       end
+      defoverridable unquote(actions[:create!][:fns])
 
       def unquote(actions[:update][:name])(resource, attributes \\ %{}) do
         Contextual.API.update(@repo, @schema, resource, attributes)
       end
+      defoverridable unquote(actions[:update][:fns])
 
       def unquote(actions[:update!][:name])(resource, attributes \\ %{}) do
         Contextual.API.update!(@repo, @schema, resource, attributes)
       end
+      defoverridable unquote(actions[:update!][:fns])
 
       def unquote(actions[:delete][:name])(resource) do
         Contextual.API.delete(@repo, resource)
       end
+      defoverridable unquote(actions[:delete][:fns])
 
       def unquote(actions[:delete!][:name])(resource) do
         Contextual.API.delete!(@repo, resource)
       end
+      defoverridable unquote(actions[:delete!][:fns])
     end
   end
 
