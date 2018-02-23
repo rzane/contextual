@@ -8,7 +8,10 @@ defmodule Contextual.MixProject do
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      docs: [extras: ["README.md"]],
+      deps: deps(),
+      aliases: aliases(),
+      package: package()
     ]
   end
 
@@ -22,6 +25,15 @@ defmodule Contextual.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
+  defp package do
+    [
+      description: "Generate your Ecto contexts using this macro and eliminate boilerplate",
+      maintainers: ["Ray Zane"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/rzane/contextual"}
+    ]
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -29,5 +41,9 @@ defmodule Contextual.MixProject do
       {:postgrex, ">= 0.0.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: [:dev, :test]}
     ]
+  end
+
+  defp aliases do
+    [test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]]
   end
 end

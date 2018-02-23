@@ -1,6 +1,6 @@
 # Contextual [![Build Status](https://travis-ci.org/rzane/contextual.svg?branch=master)](https://travis-ci.org/rzane/contextual)
 
-`Contextual` generates your [contexts](https://hexdocs.pm/phoenix/contexts.html) for you.
+`Contextual` provides a macro that will generate your Ecto [contexts](https://hexdocs.pm/phoenix/contexts.html) for you.
 
 Imagine you have a schema called `MyApp.Posts.Post`. Typically, you'd create a context
 to encapsulate `Ecto` access for creating, updating, and deleting posts.
@@ -9,7 +9,7 @@ You could use the built-in Phoenix generators to solve this problem, but then yo
 left with a bunch of boilerplate code that distracts the reader from the
 actual complexity in your contexts.
 
-As an alternative, `Contextual` provides a set of macros to get you up and running.
+Instead, `use Contextual` and delete a bunch of boilerplate code. Or not, it's entirely your decision.
 
 ## Installation
 
@@ -52,7 +52,7 @@ end
 * `delete_post`
 * `delete_post!`
 
-## Choosing which functions are generated
+## Need to choose which functions are generated?
 
 All of these functions are overridable. However, if you only wanted to define `get_post`,
 you can provide the `:only` option.
@@ -105,14 +105,8 @@ Now, you'll have `all_posts` instead of `list_posts` and `find_post` instead of 
 
 ## Contributing
 
-First, you'll need to install the dependencies:
+The tests run against PostgreSQL. The `test` command will setup a test database for you.
 
-    $ mix deps.get
-
-Next, you'll need to setup the database:
-
-    $ MIX_ENV=test mix do ecto.create, ecto.migrate
-
-Now, you can run the tests:
+To run the tests, just run:
 
     $ mix test
