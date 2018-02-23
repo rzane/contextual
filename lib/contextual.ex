@@ -16,87 +16,85 @@ defmodule Contextual do
   ]
 
   defmacro __using__(opts) do
-    actions = build_actions(opts)
-    schema = Keyword.fetch!(opts, :schema)
-    repo = Keyword.fetch!(opts, :repo)
+    opts = Keyword.put_new(opts, :name_generator, {__MODULE__, :generate_name})
 
-    quote location: :keep, bind_quoted: [actions: actions, schema: schema, repo: repo] do
-      @repo repo
-      @schema schema
+    quote location: :keep, bind_quoted: [opts: opts] do
+      @repo Keyword.fetch!(opts, :repo)
+      @schema Keyword.fetch!(opts, :schema)
 
-      Contextual.define(actions, :list, fn name ->
+      Contextual.define(opts, :list, fn name ->
         def unquote(name)(queryable \\ @schema) do
           Contextual.API.list(@repo, queryable)
         end
       end)
 
-      Contextual.define(actions, :get, fn name ->
+      Contextual.define(opts, :get, fn name ->
         def unquote(name)(queryable \\ @schema, id) do
           Contextual.API.get(@repo, queryable, id)
         end
       end)
 
-      Contextual.define(actions, :get!, fn name ->
+      Contextual.define(opts, :get!, fn name ->
         def unquote(name)(queryable \\ @schema, id) do
           Contextual.API.get!(@repo, queryable, id)
         end
       end)
 
-      Contextual.define(actions, :get_by, fn name ->
+      Contextual.define(opts, :get_by, fn name ->
         def unquote(name)(queryable \\ @schema, opts) do
           Contextual.API.get_by(@repo, queryable, opts)
         end
       end)
 
-      Contextual.define(actions, :get_by!, fn name ->
+      Contextual.define(opts, :get_by!, fn name ->
         def unquote(name)(queryable \\ @schema, opts) do
           Contextual.API.get_by!(@repo, queryable, opts)
         end
       end)
 
-      Contextual.define(actions, :fetch, fn name ->
+      Contextual.define(opts, :fetch, fn name ->
         def unquote(name)(queryable \\ @schema, id) do
           Contextual.API.fetch(@repo, queryable, id)
         end
       end)
 
-      Contextual.define(actions, :fetch_by, fn name ->
+      Contextual.define(opts, :fetch_by, fn name ->
         def unquote(name)(queryable \\ @schema, opts) do
           Contextual.API.fetch_by(@repo, queryable, opts)
         end
       end)
 
-      Contextual.define(actions, :create, fn name ->
+      Contextual.define(opts, :create, fn name ->
         def unquote(name)(attributes \\ %{}) do
           Contextual.API.create(@repo, @schema, attributes)
         end
       end)
 
-      Contextual.define(actions, :create!, fn name ->
+      Contextual.define(opts, :create!, fn name ->
         def unquote(name)(attributes \\ %{}) do
           Contextual.API.create!(@repo, @schema, attributes)
         end
       end)
 
-      Contextual.define(actions, :update, fn name ->
+      Contextual.define(opts, :update, fn name ->
         def unquote(name)(resource, attributes \\ %{}) do
           Contextual.API.update(@repo, @schema, resource, attributes)
         end
       end)
 
-      Contextual.define(actions, :update!, fn name ->
+      Contextual.define(opts, :update!, fn name ->
         def unquote(name)(resource, attributes \\ %{}) do
           Contextual.API.update!(@repo, @schema, resource, attributes)
         end
       end)
 
-      Contextual.define(actions, :delete, fn name ->
+      Contextual.define(opts, :delete, fn name ->
         def unquote(name)(resource) do
           Contextual.API.delete(@repo, resource)
         end
       end)
 
-      Contextual.define(actions, :delete!, fn name ->
+      Contextual.define(opts, :delete!, fn name ->
         def unquote(name)(resource) do
           Contextual.API.delete!(@repo, resource)
         end
@@ -104,36 +102,51 @@ defmodule Contextual do
     end
   end
 
-  defp build_actions(opts) do
-    name = Keyword.fetch!(opts, :name)
-
-    Enum.map(@operations, fn {op, arity} ->
-      name = name_for(op, name)
-      fns = Enum.map(arity, &{name, &1})
-      {op, [name: name, fns: fns]}
-    end)
-  end
-
-  defmacro define(actions, key, fun) do
-    quote bind_quoted: [actions: actions, key: key, fun: fun] do
-      if Keyword.has_key?(actions, key) do
-        fun.(actions[key][:name])
-        defoverridable actions[key][:fns]
+  defmacro define(opts, key, fun) do
+    quote bind_quoted: [opts: opts, key: key, fun: fun] do
+      if Contextual.enabled?(opts, key) do
+        fun.(Contextual.get_name(opts, key))
+        defoverridable Contextual.get_specs(opts, key)
       end
     end
   end
 
-  defp name_for(:list, {_, name}), do: :"list_#{name}"
-  defp name_for(:get, {name, _}), do: :"get_#{name}"
-  defp name_for(:get!, {name, _}), do: :"get_#{name}!"
-  defp name_for(:get_by, {name, _}), do: :"get_#{name}_by"
-  defp name_for(:get_by!, {name, _}), do: :"get_#{name}_by!"
-  defp name_for(:fetch, {name, _}), do: :"fetch_#{name}"
-  defp name_for(:fetch_by, {name, _}), do: :"fetch_#{name}_by"
-  defp name_for(:create, {name, _}), do: :"create_#{name}"
-  defp name_for(:create!, {name, _}), do: :"create_#{name}!"
-  defp name_for(:update, {name, _}), do: :"update_#{name}"
-  defp name_for(:update!, {name, _}), do: :"update_#{name}!"
-  defp name_for(:delete, {name, _}), do: :"delete_#{name}"
-  defp name_for(:delete!, {name, _}), do: :"delete_#{name}!"
+  @doc false
+  def enabled?(_opts, _key) do
+    true
+  end
+
+  @doc false
+  def get_name(opts, key) do
+    {mod, fun} = Keyword.fetch!(opts, :name_generator)
+    name_config = Keyword.fetch!(opts, :name)
+
+    with :default <- apply(mod, fun, [key, name_config]) do
+      generate_name(key, name_config)
+    end
+  end
+
+  @doc false
+  def get_specs(opts, key) do
+    name = get_name(opts, key)
+
+    @operations
+    |> Keyword.fetch!(key)
+    |> Enum.map(&{name, &1})
+  end
+
+  @doc false
+  def generate_name(:list, {_, name}), do: :"list_#{name}"
+  def generate_name(:get, {name, _}), do: :"get_#{name}"
+  def generate_name(:get!, {name, _}), do: :"get_#{name}!"
+  def generate_name(:get_by, {name, _}), do: :"get_#{name}_by"
+  def generate_name(:get_by!, {name, _}), do: :"get_#{name}_by!"
+  def generate_name(:fetch, {name, _}), do: :"fetch_#{name}"
+  def generate_name(:fetch_by, {name, _}), do: :"fetch_#{name}_by"
+  def generate_name(:create, {name, _}), do: :"create_#{name}"
+  def generate_name(:create!, {name, _}), do: :"create_#{name}!"
+  def generate_name(:update, {name, _}), do: :"update_#{name}"
+  def generate_name(:update!, {name, _}), do: :"update_#{name}!"
+  def generate_name(:delete, {name, _}), do: :"delete_#{name}"
+  def generate_name(:delete!, {name, _}), do: :"delete_#{name}!"
 end
