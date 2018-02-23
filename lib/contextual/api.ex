@@ -41,6 +41,10 @@ defmodule Contextual.API do
     end
   end
 
+  def change(schema, resource, attributes) do
+    schema.changeset(resource, attributes)
+  end
+
   def create(repo, schema, attributes) do
     schema
     |> struct()

@@ -7,6 +7,9 @@ defmodule ContextualTest do
   alias Contextual.Test.Posts.Post
 
   @all_functions [
+    change_post: 0,
+    change_post: 1,
+    change_post: 2,
     create_post: 0,
     create_post: 1,
     create_post!: 0,
@@ -59,6 +62,25 @@ defmodule ContextualTest do
       assert_raise Ecto.InvalidChangesetError, fn ->
         Posts.create_post!(%{title: ""})
       end
+    end
+
+    test "change/0" do
+      assert %Ecto.Changeset{data: %Post{}, changes: %{}} = Posts.change_post()
+    end
+
+    test "change/1" do
+      post = post_fixture()
+      assert %Ecto.Changeset{data: ^post, changes: %{}} = Posts.change_post(post)
+
+      assert %Ecto.Changeset{data: %Post{}, changes: %{title: "Jawn"}} =
+               Posts.change_post(%{title: "Jawn"})
+    end
+
+    test "change/2" do
+      post = post_fixture()
+
+      assert %Ecto.Changeset{data: ^post, changes: %{title: "Jawn"}} =
+               Posts.change_post(post, %{title: "Jawn"})
     end
 
     test "list/0" do

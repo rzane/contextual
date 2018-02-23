@@ -45,6 +45,7 @@ end
 * `get_post_by!`
 * `fetch_post`
 * `fetch_post_by`
+* `change_post`
 * `create_post`
 * `create_post!`
 * `update_post`

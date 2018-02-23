@@ -145,6 +145,42 @@ defmodule Contextual do
         end
       end)
 
+      Contextual.define(opts, :change, fn name ->
+        @doc """
+        Create an `Ecto.Changeset` for a `#{inspect(@__schema__)}`.
+
+        ## Examples
+
+            iex> #{name}()
+            %Ecto.Changeset{}
+
+            iex> #{name}(%{title: "Meatloaf"})
+            %Ecto.Changeset{}
+
+            iex> #{name}(%#{inspect(@__schema__)}{})
+            %Ecto.Changeset{}
+
+            iex> #{name}(%#{inspect(@__schema__)}{}, %{title: "Meatloaf"})
+            %Ecto.Changeset{}
+
+        """
+        def unquote(name)() do
+          Contextual.API.change(@__schema__, struct(@__schema__), %{})
+        end
+
+        def unquote(name)(%@__schema__{} = resource) do
+          Contextual.API.change(@__schema__, resource, %{})
+        end
+
+        def unquote(name)(attributes) when is_map(attributes) do
+          Contextual.API.change(@__schema__, struct(@__schema__), attributes)
+        end
+
+        def unquote(name)(%__schema__{} = resource, attributes) when is_map(attributes) do
+          Contextual.API.change(@__schema__, resource, attributes)
+        end
+      end)
+
       Contextual.define(opts, :create, fn name ->
         @doc """
         Creates a `#{inspect(@__schema__)}`.
@@ -311,6 +347,7 @@ defmodule Contextual do
   def generate_name(:get_by!, {name, _}), do: :"get_#{name}_by!"
   def generate_name(:fetch, {name, _}), do: :"fetch_#{name}"
   def generate_name(:fetch_by, {name, _}), do: :"fetch_#{name}_by"
+  def generate_name(:change, {name, _}), do: :"change_#{name}"
   def generate_name(:create, {name, _}), do: :"create_#{name}"
   def generate_name(:create!, {name, _}), do: :"create_#{name}!"
   def generate_name(:update, {name, _}), do: :"update_#{name}"
