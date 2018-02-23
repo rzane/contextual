@@ -12,9 +12,11 @@ defmodule ContextualTest do
   end
 
   defp post_fixture(attrs \\ []) do
-    attrs
-    |> Enum.into(%{title: "Post"})
-    |> Posts.create_post!()
+    attrs = Enum.into(attrs, %{title: "Post"})
+
+    %Post{}
+    |> Post.changeset(attrs)
+    |> Repo.insert!()
   end
 
   test "create/1" do

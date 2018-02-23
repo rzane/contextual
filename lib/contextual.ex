@@ -1,6 +1,22 @@
 defmodule Contextual do
+  @operations [
+    list: [0, 1],
+    get: [1, 2],
+    get!: [1, 2],
+    get_by: [1, 2],
+    get_by!: [1, 2],
+    fetch: [1, 2],
+    fetch_by: [1, 2],
+    create: [0, 1],
+    create!: [0, 1],
+    update: [1, 2],
+    update!: [1, 2],
+    delete: [1],
+    delete!: [1]
+  ]
+
   defmacro __using__(opts) do
-    {singular, plural} = Keyword.fetch!(opts, :name)
+    actions = build_actions(opts)
     schema = Keyword.fetch!(opts, :schema)
     repo = Keyword.fetch!(opts, :repo)
 
@@ -8,57 +24,81 @@ defmodule Contextual do
       @repo unquote(repo)
       @schema unquote(schema)
 
-      def unquote(:"list_#{plural}")(queryable \\ @schema) do
+      def unquote(actions[:list][:name])(queryable \\ @schema) do
         Contextual.API.list(@repo, queryable)
       end
 
-      def unquote(:"get_#{singular}")(queryable \\ @schema, id) do
+      def unquote(actions[:get][:name])(queryable \\ @schema, id) do
         Contextual.API.get(@repo, queryable, id)
       end
 
-      def unquote(:"get_#{singular}!")(queryable \\ @schema, id) do
+      def unquote(actions[:get!][:name])(queryable \\ @schema, id) do
         Contextual.API.get!(@repo, queryable, id)
       end
 
-      def unquote(:"get_#{singular}_by")(queryable \\ @schema, opts) do
+      def unquote(actions[:get_by][:name])(queryable \\ @schema, opts) do
         Contextual.API.get_by(@repo, queryable, opts)
       end
 
-      def unquote(:"get_#{singular}_by!")(queryable \\ @schema, opts) do
+      def unquote(actions[:get_by!][:name])(queryable \\ @schema, opts) do
         Contextual.API.get_by!(@repo, queryable, opts)
       end
 
-      def unquote(:"fetch_#{singular}")(queryable \\ @schema, id) do
+      def unquote(actions[:fetch][:name])(queryable \\ @schema, id) do
         Contextual.API.fetch(@repo, queryable, id)
       end
 
-      def unquote(:"fetch_#{singular}_by")(queryable \\ @schema, opts) do
+      def unquote(actions[:fetch_by][:name])(queryable \\ @schema, opts) do
         Contextual.API.fetch_by(@repo, queryable, opts)
       end
 
-      def unquote(:"create_#{singular}")(attributes \\ %{}) do
+      def unquote(actions[:create][:name])(attributes \\ %{}) do
         Contextual.API.create(@repo, @schema, attributes)
       end
 
-      def unquote(:"create_#{singular}!")(attributes \\ %{}) do
+      def unquote(actions[:create!][:name])(attributes \\ %{}) do
         Contextual.API.create!(@repo, @schema, attributes)
       end
 
-      def unquote(:"update_#{singular}")(resource, attributes \\ %{}) do
+      def unquote(actions[:update][:name])(resource, attributes \\ %{}) do
         Contextual.API.update(@repo, @schema, resource, attributes)
       end
 
-      def unquote(:"update_#{singular}!")(resource, attributes \\ %{}) do
+      def unquote(actions[:update!][:name])(resource, attributes \\ %{}) do
         Contextual.API.update!(@repo, @schema, resource, attributes)
       end
 
-      def unquote(:"delete_#{singular}")(resource) do
+      def unquote(actions[:delete][:name])(resource) do
         Contextual.API.delete(@repo, resource)
       end
 
-      def unquote(:"delete_#{singular}!")(resource) do
+      def unquote(actions[:delete!][:name])(resource) do
         Contextual.API.delete!(@repo, resource)
       end
     end
   end
+
+  defp build_actions(opts) do
+    name = Keyword.fetch!(opts, :name)
+
+    Enum.map(@operations, fn {op, arity} ->
+      name = name_for(op, name)
+      fns = Enum.map(arity, &{name, &1})
+      {op, [name: name, fns: fns]}
+    end)
+  end
+
+  defp name_for(:list, {_, name}), do: :"list_#{name}"
+  defp name_for(:get, {name, _}), do: :"get_#{name}"
+  defp name_for(:get!, {name, _}), do: :"get_#{name}!"
+  defp name_for(:get_by, {name, _}), do: :"get_#{name}_by"
+  defp name_for(:get_by!, {name, _}), do: :"get_#{name}_by!"
+  defp name_for(:fetch, {name, _}), do: :"fetch_#{name}"
+  defp name_for(:fetch_by, {name, _}), do: :"fetch_#{name}_by"
+  defp name_for(:create, {name, _}), do: :"create_#{name}"
+  defp name_for(:create!, {name, _}), do: :"create_#{name}!"
+  defp name_for(:update, {name, _}), do: :"update_#{name}"
+  defp name_for(:update!, {name, _}), do: :"update_#{name}!"
+  defp name_for(:delete, {name, _}), do: :"delete_#{name}"
+  defp name_for(:delete!, {name, _}), do: :"delete_#{name}!"
 end
