@@ -24,83 +24,83 @@ defmodule Contextual do
       @repo repo
       @schema schema
 
-      def unquote(actions[:list][:name])(queryable \\ @schema) do
-        Contextual.API.list(@repo, queryable)
-      end
+      Contextual.define(actions, :list, fn name ->
+        def unquote(name)(queryable \\ @schema) do
+          Contextual.API.list(@repo, queryable)
+        end
+      end)
 
-      defoverridable actions[:list][:fns]
+      Contextual.define(actions, :get, fn name ->
+        def unquote(name)(queryable \\ @schema, id) do
+          Contextual.API.get(@repo, queryable, id)
+        end
+      end)
 
-      def unquote(actions[:get][:name])(queryable \\ @schema, id) do
-        Contextual.API.get(@repo, queryable, id)
-      end
+      Contextual.define(actions, :get!, fn name ->
+        def unquote(name)(queryable \\ @schema, id) do
+          Contextual.API.get!(@repo, queryable, id)
+        end
+      end)
 
-      defoverridable actions[:get][:fns]
+      Contextual.define(actions, :get_by, fn name ->
+        def unquote(name)(queryable \\ @schema, opts) do
+          Contextual.API.get_by(@repo, queryable, opts)
+        end
+      end)
 
-      def unquote(actions[:get!][:name])(queryable \\ @schema, id) do
-        Contextual.API.get!(@repo, queryable, id)
-      end
+      Contextual.define(actions, :get_by!, fn name ->
+        def unquote(name)(queryable \\ @schema, opts) do
+          Contextual.API.get_by!(@repo, queryable, opts)
+        end
+      end)
 
-      defoverridable actions[:get!][:fns]
+      Contextual.define(actions, :fetch, fn name ->
+        def unquote(name)(queryable \\ @schema, id) do
+          Contextual.API.fetch(@repo, queryable, id)
+        end
+      end)
 
-      def unquote(actions[:get_by][:name])(queryable \\ @schema, opts) do
-        Contextual.API.get_by(@repo, queryable, opts)
-      end
+      Contextual.define(actions, :fetch_by, fn name ->
+        def unquote(name)(queryable \\ @schema, opts) do
+          Contextual.API.fetch_by(@repo, queryable, opts)
+        end
+      end)
 
-      defoverridable actions[:get_by][:fns]
+      Contextual.define(actions, :create, fn name ->
+        def unquote(name)(attributes \\ %{}) do
+          Contextual.API.create(@repo, @schema, attributes)
+        end
+      end)
 
-      def unquote(actions[:get_by!][:name])(queryable \\ @schema, opts) do
-        Contextual.API.get_by!(@repo, queryable, opts)
-      end
+      Contextual.define(actions, :create!, fn name ->
+        def unquote(name)(attributes \\ %{}) do
+          Contextual.API.create!(@repo, @schema, attributes)
+        end
+      end)
 
-      defoverridable actions[:get_by!][:fns]
+      Contextual.define(actions, :update, fn name ->
+        def unquote(name)(resource, attributes \\ %{}) do
+          Contextual.API.update(@repo, @schema, resource, attributes)
+        end
+      end)
 
-      def unquote(actions[:fetch][:name])(queryable \\ @schema, id) do
-        Contextual.API.fetch(@repo, queryable, id)
-      end
+      Contextual.define(actions, :update!, fn name ->
+        def unquote(name)(resource, attributes \\ %{}) do
+          Contextual.API.update!(@repo, @schema, resource, attributes)
+        end
+      end)
 
-      defoverridable actions[:fetch][:fns]
+      Contextual.define(actions, :delete, fn name ->
+        def unquote(name)(resource) do
+          Contextual.API.delete(@repo, resource)
+        end
+      end)
 
-      def unquote(actions[:fetch_by][:name])(queryable \\ @schema, opts) do
-        Contextual.API.fetch_by(@repo, queryable, opts)
-      end
-
-      defoverridable actions[:fetch_by][:fns]
-
-      def unquote(actions[:create][:name])(attributes \\ %{}) do
-        Contextual.API.create(@repo, @schema, attributes)
-      end
-
-      defoverridable actions[:create][:fns]
-
-      def unquote(actions[:create!][:name])(attributes \\ %{}) do
-        Contextual.API.create!(@repo, @schema, attributes)
-      end
-
-      defoverridable actions[:create!][:fns]
-
-      def unquote(actions[:update][:name])(resource, attributes \\ %{}) do
-        Contextual.API.update(@repo, @schema, resource, attributes)
-      end
-
-      defoverridable actions[:update][:fns]
-
-      def unquote(actions[:update!][:name])(resource, attributes \\ %{}) do
-        Contextual.API.update!(@repo, @schema, resource, attributes)
-      end
-
-      defoverridable actions[:update!][:fns]
-
-      def unquote(actions[:delete][:name])(resource) do
-        Contextual.API.delete(@repo, resource)
-      end
-
-      defoverridable actions[:delete][:fns]
-
-      def unquote(actions[:delete!][:name])(resource) do
-        Contextual.API.delete!(@repo, resource)
-      end
-
-      defoverridable actions[:delete!][:fns]
+      Contextual.define(actions, :delete!, fn name ->
+        def unquote(name)(resource) do
+          Contextual.API.delete!(@repo, resource)
+        end
+      end)
     end
   end
 
@@ -112,6 +112,15 @@ defmodule Contextual do
       fns = Enum.map(arity, &{name, &1})
       {op, [name: name, fns: fns]}
     end)
+  end
+
+  defmacro define(actions, key, fun) do
+    quote bind_quoted: [actions: actions, key: key, fun: fun] do
+      if Keyword.has_key?(actions, key) do
+        fun.(actions[key][:name])
+        defoverridable actions[key][:fns]
+      end
+    end
   end
 
   defp name_for(:list, {_, name}), do: :"list_#{name}"
