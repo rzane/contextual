@@ -23,9 +23,15 @@ end
 
 Documentation can be found at [https://hexdocs.pm/contextual](https://hexdocs.pm/contextual).
 
-## Creating your context
+## Usage
 
-Here's how you'd define your context:
+Contextual requires three options:
+
+* `:name` - A tuple of `{:singular, :plural}` naming for your resource.
+* `:schema` - An `Ecto.Schema`
+* `:repo` - An `Ecto.Repo`
+
+Here's what your context might look like:
 
 ```elixir
 defmodule MyApp.Posts do
@@ -77,7 +83,7 @@ post = Posts.update_post!(post, %{title: "Meatloaf"})
 post = Posts.delete_post!(post)
 ```
 
-## Need to choose which functions are generated?
+### Choosing which functions are generated
 
 That seems reasonable. If you only wanted to define `get_post`, you can provide the `:only` option.
 
@@ -93,9 +99,9 @@ end
 
 Similarly, `Contextual` provides an `:except` option, which is basically just the opposite of `:only`.
 
-## Don't like the default function names?
+### Customizing function names
 
-Okay, that's fine. You can create your own name generator to solve this problem.
+Contextual allows you to choose how your functions are named by using a name generator.
 
 First, create a module that will serve as a name generator:
 
@@ -113,6 +119,9 @@ defmodule MyApp.ContextNaming do
 end
 ```
 
+The `generate_name/2` function must return an atom. If the function returns `:default`, Contextual will
+fallback to the default naming convention.
+
 Next, you'll need to configure your context to use your name generator:
 
 ```elixir
@@ -127,10 +136,12 @@ end
 
 Now, you'll have `all_posts` instead of `list_posts` and `find_post` instead of `get_post`.
 
-## I'm getting typespec errors
+### Typespecs
 
-Contextual's typespecs expect your schema to have a type `t` defined. To get the typespecs
-working properly, you'll need to define that type on your schema.
+Contextual will automatically generate documentation and typespecs for thefunctions
+that it defines. However, it expects your schema to have a type `t` defined.
+
+To get the typespecs working properly, you'll need to define that type on your schema:
 
 ```elixir
 defmodule MyApp.Posts.Post do
