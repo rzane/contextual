@@ -243,10 +243,16 @@ defmodule ContextualTest do
   describe "custom name generation" do
     alias Contextual.Test.PostsWithCustomName, as: Posts
 
-    test "catch_em_all/1" do
+    test "all_posts/1" do
       post_fixture()
       post_fixture()
-      assert [%Post{}, %Post{}] = Posts.catch_em_all()
+      assert [%Post{}, %Post{}] = Posts.all_posts()
+    end
+
+    test "find_post/1" do
+      post = post_fixture()
+      assert %Post{} = Posts.find_post(post.id)
+      refute Posts.find_post(49)
     end
 
     test "falls back to the default when the name generator returns :default" do

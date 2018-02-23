@@ -1,6 +1,10 @@
 defmodule Contextual.Test.NameGenerator do
-  def generate_name(:list, {_singular, _plural}) do
-    :catch_em_all
+  def generate_name(:list, {_singular, plural}) do
+    :"all_#{plural}"
+  end
+
+  def generate_name(:get, {singular, _plural}) do
+    :"find_#{singular}"
   end
 
   def generate_name(_, _), do: :default
