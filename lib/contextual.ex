@@ -19,107 +19,107 @@ defmodule Contextual do
     opts = Keyword.put_new(opts, :name_generator, {__MODULE__, :generate_name})
 
     quote location: :keep, bind_quoted: [opts: opts] do
-      @repo Keyword.fetch!(opts, :repo)
-      @schema Keyword.fetch!(opts, :schema)
+      @__repo__ Keyword.fetch!(opts, :repo)
+      @__schema__ Keyword.fetch!(opts, :schema)
 
       Contextual.define(opts, :list, fn name ->
         @doc """
-        Returns a list of all `#{inspect(@schema)}`s.
+        Returns a list of all `#{inspect(@__schema__)}`s.
 
         ## Examples
 
             iex> #{name}()
-            [%#{inspect(@schema)}{}, %#{inspect(@schema)}{}, ...]
+            [%#{inspect(@__schema__)}{}, %#{inspect(@__schema__)}{}, ...]
 
         """
-        def unquote(name)(queryable \\ @schema) do
-          Contextual.API.list(@repo, queryable)
+        def unquote(name)(queryable \\ @__schema__) do
+          Contextual.API.list(@__repo__, queryable)
         end
       end)
 
       Contextual.define(opts, :get, fn name ->
         @doc """
-        Gets a single `#{inspect(@schema)}`.
+        Gets a single `#{inspect(@__schema__)}`.
 
         Returns `nil` if the record does not exist.
 
         ## Examples
 
             iex> #{name}(19)
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(42)
             nil
 
         """
-        def unquote(name)(queryable \\ @schema, id) do
-          Contextual.API.get(@repo, queryable, id)
+        def unquote(name)(queryable \\ @__schema__, id) do
+          Contextual.API.get(@__repo__, queryable, id)
         end
       end)
 
       Contextual.define(opts, :get!, fn name ->
         @doc """
-        Gets a single `#{inspect(@schema)}`.
+        Gets a single `#{inspect(@__schema__)}`.
 
         Raises `Ecto.NoResultsError` if the record does not exist.
 
         ## Examples
 
             iex> #{name}(19)
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(42)
             ** (Ecto.NoResultsError)
 
         """
-        def unquote(name)(queryable \\ @schema, id) do
-          Contextual.API.get!(@repo, queryable, id)
+        def unquote(name)(queryable \\ @__schema__, id) do
+          Contextual.API.get!(@__repo__, queryable, id)
         end
       end)
 
       Contextual.define(opts, :get_by, fn name ->
         @doc """
-        Finds a `#{inspect(@schema)}` with the given attributes.
+        Finds a `#{inspect(@__schema__)}` with the given attributes.
 
         Returns `nil` if the record is not found.
 
         ## Examples
 
             iex> #{name}(title: "Meatloaf")
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(title: "Baloney")
             nil
 
         """
-        def unquote(name)(queryable \\ @schema, clauses) do
-          Contextual.API.get_by(@repo, queryable, clauses)
+        def unquote(name)(queryable \\ @__schema__, clauses) do
+          Contextual.API.get_by(@__repo__, queryable, clauses)
         end
       end)
 
       Contextual.define(opts, :get_by!, fn name ->
         @doc """
-        Finds a `#{inspect(@schema)}` with the given attributes.
+        Finds a `#{inspect(@__schema__)}` with the given attributes.
 
         Returns `nil` if the record is not found.
 
         ## Examples
 
             iex> #{name}(title: "Meatloaf")
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(title: "Baloney")
             ** (Ecto.NoResultsError)
 
         """
-        def unquote(name)(queryable \\ @schema, clauses) do
-          Contextual.API.get_by!(@repo, queryable, clauses)
+        def unquote(name)(queryable \\ @__schema__, clauses) do
+          Contextual.API.get_by!(@__repo__, queryable, clauses)
         end
       end)
 
       Contextual.define(opts, :fetch, fn name ->
         @doc """
-        Gets a single `#{inspect(@schema)}`.
+        Gets a single `#{inspect(@__schema__)}`.
 
         Returns `{:ok, record}` if the record is found.
 
@@ -128,20 +128,20 @@ defmodule Contextual do
         ## Examples
 
             iex> #{name}(19)
-            {:ok, %#{inspect(@schema)}{}}
+            {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(42)
             :error
 
         """
-        def unquote(name)(queryable \\ @schema, id) do
-          Contextual.API.fetch(@repo, queryable, id)
+        def unquote(name)(queryable \\ @__schema__, id) do
+          Contextual.API.fetch(@__repo__, queryable, id)
         end
       end)
 
       Contextual.define(opts, :fetch_by, fn name ->
         @doc """
-        Finds a `#{inspect(@schema)}` by the given attributes.
+        Finds a `#{inspect(@__schema__)}` by the given attributes.
 
         Returns `{:ok, record}` if the record is found.
 
@@ -150,136 +150,139 @@ defmodule Contextual do
         ## Examples
 
             iex> #{name}(title: "Meatloaf")
-            {:ok, %#{inspect(@schema)}{}}
+            {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(title: "Baloney")
             :error
 
         """
-        def unquote(name)(queryable \\ @schema, clauses) do
-          Contextual.API.fetch_by(@repo, queryable, clauses)
+        def unquote(name)(queryable \\ @__schema__, clauses) do
+          Contextual.API.fetch_by(@__repo__, queryable, clauses)
         end
       end)
 
       Contextual.define(opts, :create, fn name ->
         @doc """
-        Creates a `#{inspect(@schema)}`.
+        Creates a `#{inspect(@__schema__)}`.
 
         Returns `{:error, changeset}` in the case of failure.
 
         ## Examples
 
             iex> #{name}(%{title: "Meatloaf"})
-            {:ok, %#{inspect(@schema)}{}}
+            {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(%{title: ""})
             {:error, %Ecto.Changeset{}}
 
         """
         def unquote(name)(attributes \\ %{}) do
-          Contextual.API.create(@repo, @schema, attributes)
+          Contextual.API.create(@__repo__, @__schema__, attributes)
         end
       end)
 
       Contextual.define(opts, :create!, fn name ->
         @doc """
-        Creates a `#{inspect(@schema)}`.
+        Creates a `#{inspect(@__schema__)}`.
 
         Raises `Ecto.InvalidChangesetError` if the record is invalid.
 
         ## Examples
 
             iex> #{name}(%{title: "Meatloaf"})
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(%{title: ""})
             ** (Ecto.InvalidChangesetError)
 
         """
         def unquote(name)(attributes \\ %{}) do
-          Contextual.API.create!(@repo, @schema, attributes)
+          Contextual.API.create!(@__repo__, @__schema__, attributes)
         end
       end)
 
       Contextual.define(opts, :update, fn name ->
         @doc """
-        Updates a `#{inspect(@schema)}`.
+        Updates a `#{inspect(@__schema__)}`.
 
         Returns `{:error, changeset}` in the case of failure.
 
         ## Examples
 
             iex> #{name}(%{title: "Meatloaf"})
-            {:ok, %#{inspect(@schema)}{}}
+            {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(%{title: ""})
             {:error, %Ecto.Changeset{}}
 
         """
         def unquote(name)(resource, attributes \\ %{}) do
-          Contextual.API.update(@repo, @schema, resource, attributes)
+          Contextual.API.update(@__repo__, @__schema__, resource, attributes)
         end
       end)
 
       Contextual.define(opts, :update!, fn name ->
         @doc """
-        Updates a `#{inspect(@schema)}`.
+        Updates a `#{inspect(@__schema__)}`.
 
         Raises `Ecto.InvalidChangesetError` if the record is invalid.
 
         ## Examples
 
             iex> #{name}(%{title: "Meatloaf"})
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(%{title: ""})
             ** (Ecto.InvalidChangesetError)
 
         """
         def unquote(name)(resource, attributes \\ %{}) do
-          Contextual.API.update!(@repo, @schema, resource, attributes)
+          Contextual.API.update!(@__repo__, @__schema__, resource, attributes)
         end
       end)
 
       Contextual.define(opts, :delete, fn name ->
         @doc """
-        Deletes a `#{inspect(@schema)}`.
+        Deletes a `#{inspect(@__schema__)}`.
 
         Returns `{:error, changeset}` in the case of failure.
 
         ## Examples
 
             iex> #{name}(record)
-            {:ok, %#{inspect(@schema)}{}}
+            {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(record)
             {:error, %Ecto.Changeset{}}
 
         """
         def unquote(name)(resource) do
-          Contextual.API.delete(@repo, resource)
+          Contextual.API.delete(@__repo__, resource)
         end
       end)
 
       Contextual.define(opts, :delete!, fn name ->
         @doc """
-        Deletes a `#{inspect(@schema)}`.
+        Deletes a `#{inspect(@__schema__)}`.
 
         Raises `Ecto.InvalidChangesetError` if the record is invalid.
 
         ## Examples
 
             iex> #{name}(record)
-            %#{inspect(@schema)}{}
+            %#{inspect(@__schema__)}{}
 
             iex> #{name}(record)
             ** (Ecto.InvalidChangesetError)
 
         """
         def unquote(name)(resource) do
-          Contextual.API.delete!(@repo, resource)
+          Contextual.API.delete!(@__repo__, resource)
         end
       end)
+
+      Module.delete_attribute(__MODULE__, :__repo__)
+      Module.delete_attribute(__MODULE__, :__schema__)
     end
   end
 
