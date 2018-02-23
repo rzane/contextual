@@ -113,8 +113,17 @@ defmodule Contextual do
   end
 
   @doc false
-  def enabled?(_opts, _key) do
-    true
+  def enabled?(opts, key) do
+    cond do
+      opts[:only] ->
+        key in opts[:only]
+
+      opts[:except] ->
+        key not in opts[:except]
+
+      true ->
+        true
+    end
   end
 
   @doc false

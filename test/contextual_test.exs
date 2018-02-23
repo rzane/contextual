@@ -6,6 +6,33 @@ defmodule ContextualTest do
   alias Contextual.Test.Repo
   alias Contextual.Test.Posts.Post
 
+  @all_functions [
+    create_post: 0,
+    create_post: 1,
+    create_post!: 0,
+    create_post!: 1,
+    delete_post: 1,
+    delete_post!: 1,
+    fetch_post: 1,
+    fetch_post: 2,
+    fetch_post_by: 1,
+    fetch_post_by: 2,
+    get_post: 1,
+    get_post: 2,
+    get_post!: 1,
+    get_post!: 2,
+    get_post_by: 1,
+    get_post_by: 2,
+    get_post_by!: 1,
+    get_post_by!: 2,
+    list_posts: 0,
+    list_posts: 1,
+    update_post: 1,
+    update_post: 2,
+    update_post!: 1,
+    update_post!: 2
+  ]
+
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
   end
@@ -185,6 +212,10 @@ defmodule ContextualTest do
       assert %Post{} = Posts.delete_post!(post)
       refute Posts.get_post(post.id)
     end
+
+    test "defines all functions" do
+      assert Posts.__info__(:functions) == @all_functions
+    end
   end
 
   describe "custom name generation" do
@@ -198,6 +229,22 @@ defmodule ContextualTest do
 
     test "falls back to the default when the name generator returns :default" do
       assert %Post{} = Posts.create_post!(%{title: "Jawn"})
+    end
+  end
+
+  describe "only" do
+    alias Contextual.Test.PostsWithOnly, as: Posts
+
+    test "only defines the requested functions" do
+      assert Posts.__info__(:functions) == [get_post: 1, get_post: 2]
+    end
+  end
+
+  describe "except" do
+    alias Contextual.Test.PostsWithExcept, as: Posts
+
+    test "only defines the requested functions" do
+      assert Posts.__info__(:functions) == @all_functions -- [delete_post: 1]
     end
   end
 end
