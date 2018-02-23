@@ -63,6 +63,7 @@ defmodule ContextualTest do
   test "get!/1" do
     post = post_fixture()
     assert Posts.get_post!(post.id) == post
+
     assert_raise Ecto.NoResultsError, fn ->
       Posts.get_post!(49)
     end
@@ -73,6 +74,7 @@ defmodule ContextualTest do
     query = from(p in Post, where: p.title == "Jawn")
 
     assert Posts.get_post!(query, post.id) == post
+
     assert_raise Ecto.NoResultsError, fn ->
       Posts.get_post!(query, 49)
     end
@@ -162,6 +164,7 @@ defmodule ContextualTest do
     post = post_fixture()
 
     assert %Post{title: "Jint"} = Posts.update_post!(post, %{title: "Jint"})
+
     assert_raise Ecto.InvalidChangesetError, fn ->
       Posts.update_post!(post, %{title: ""})
     end
