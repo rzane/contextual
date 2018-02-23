@@ -102,6 +102,7 @@ defmodule Contextual do
     end
   end
 
+  @doc false
   defmacro define(opts, key, fun) do
     quote bind_quoted: [opts: opts, key: key, fun: fun] do
       if Contextual.enabled?(opts, key) do
