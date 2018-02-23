@@ -54,8 +54,7 @@ end
 
 ## Need to choose which functions are generated?
 
-All of these functions are overridable. However, if you only wanted to define `get_post`,
-you can provide the `:only` option.
+That seems reasonable. If you only wanted to define `get_post`, you can provide the `:only` option.
 
 ```elixir
 defmodule MyApp.Posts do

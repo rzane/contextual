@@ -1,20 +1,4 @@
 defmodule Contextual do
-  @operations [
-    list: [0, 1],
-    get: [1, 2],
-    get!: [1, 2],
-    get_by: [1, 2],
-    get_by!: [1, 2],
-    fetch: [1, 2],
-    fetch_by: [1, 2],
-    create: [0, 1],
-    create!: [0, 1],
-    update: [1, 2],
-    update!: [1, 2],
-    delete: [1],
-    delete!: [1]
-  ]
-
   defmacro __using__(opts) do
     opts = Keyword.put_new(opts, :name_generator, {__MODULE__, :generate_name})
 
@@ -291,7 +275,6 @@ defmodule Contextual do
     quote bind_quoted: [opts: opts, key: key, fun: fun] do
       if Contextual.enabled?(opts, key) do
         fun.(Contextual.get_name(opts, key))
-        defoverridable Contextual.get_specs(opts, key)
       end
     end
   end
@@ -318,15 +301,6 @@ defmodule Contextual do
     with :default <- apply(mod, fun, [key, name_config]) do
       generate_name(key, name_config)
     end
-  end
-
-  @doc false
-  def get_specs(opts, key) do
-    name = get_name(opts, key)
-
-    @operations
-    |> Keyword.fetch!(key)
-    |> Enum.map(&{name, &1})
   end
 
   @doc false
