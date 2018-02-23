@@ -166,17 +166,13 @@ defmodule Contextual do
         @doc """
         See the documentation for `#{name}/2`.
         """
-        @spec unquote(name)(%unquote(@__schema__){}) :: Ecto.Changeset.t()
-        def unquote(name)(%@__schema__{} = resource) do
-          Contextual.API.change(@__schema__, resource, %{})
+        @spec unquote(name)(%unquote(@__schema__){} | map) :: Ecto.Changeset.t()
+        def unquote(name)(%@__schema__{} = resource_or_attributes) do
+          Contextual.API.change(@__schema__, resource_or_attributes, %{})
         end
 
-        @doc """
-        See the documentation for `#{name}/2`.
-        """
-        @spec unquote(name)(map) :: Ecto.Changeset.t()
-        def unquote(name)(attributes) when is_map(attributes) do
-          Contextual.API.change(@__schema__, struct(@__schema__), attributes)
+        def unquote(name)(resource_or_attributes) when is_map(resource_or_attributes) do
+          Contextual.API.change(@__schema__, struct(@__schema__), resource_or_attributes)
         end
 
         @doc """
