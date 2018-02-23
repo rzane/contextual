@@ -1,4 +1,6 @@
 defmodule Contextual.API do
+  @moduledoc false
+
   def list(repo, queryable) do
     repo.all(queryable)
   end
