@@ -3,6 +3,8 @@ language: elixir
 cache:
   directories:
     - $HOME/.mix
+    - _build
+    - deps
 
 elixir:
   - 1.6.1
