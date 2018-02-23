@@ -1,4 +1,4 @@
-# Contextual
+# Contextual [![Build Status](https://travis-ci.org/rzane/contextual.svg?branch=master)](https://travis-ci.org/rzane/contextual)
 
 `Contextual` generates your [contexts](https://hexdocs.pm/phoenix/contexts.html) for you.
 
