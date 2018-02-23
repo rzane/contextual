@@ -5,6 +5,8 @@ defmodule Contextual.Test.Posts.Post do
 
   alias Contextual.Test.Posts.Post
 
+  @type t :: %__MODULE__{}
+
   schema "posts" do
     field(:title, :string)
     timestamps()
