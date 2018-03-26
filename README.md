@@ -17,7 +17,7 @@ The package can be installed by adding `contextual` to your list of dependencies
 
 ```elixir
 def deps do
-  [{:contextual, "~> 0.1.0"}]
+  [{:contextual, "~> 1.0.0"}]
 end
 ```
 
