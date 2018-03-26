@@ -174,7 +174,7 @@ defmodule ContextualTest do
     test "fetch/1" do
       post = post_fixture(title: "Jawn")
       assert Posts.fetch_post(post.id) == {:ok, post}
-      assert Posts.fetch_post(49) == :error
+      assert Posts.fetch_post(49) == {:error, :not_found}
     end
 
     test "fetch/2" do
@@ -184,14 +184,14 @@ defmodule ContextualTest do
       query = from(p in Post, where: p.title == "Jawn")
 
       assert Posts.fetch_post(query, jawn.id) == {:ok, jawn}
-      assert Posts.fetch_post(query, jint.id) == :error
+      assert Posts.fetch_post(query, jint.id) == {:error, :not_found}
     end
 
     test "fetch_by/1" do
       post = post_fixture(title: "Jawn")
 
       assert Posts.fetch_post_by(title: "Jawn") == {:ok, post}
-      assert Posts.fetch_post_by(title: "Jint") == :error
+      assert Posts.fetch_post_by(title: "Jint") == {:error, :not_found}
     end
 
     test "fetch_by/2" do
@@ -201,7 +201,7 @@ defmodule ContextualTest do
       query = from(p in Post, where: p.title == "Jawn")
 
       assert Posts.fetch_post_by(query, id: jawn.id) == {:ok, jawn}
-      assert Posts.fetch_post_by(query, id: jint.id) == :error
+      assert Posts.fetch_post_by(query, id: jint.id) == {:error, :not_found}
     end
 
     test "update/2" do

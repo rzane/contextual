@@ -112,7 +112,7 @@ defmodule Contextual do
 
         Returns `{:ok, record}` if the record is found.
 
-        Returns `:error` if the record does not exist.
+        Returns `{:error, :not_found}` if the record does not exist.
 
         ## Examples
 
@@ -120,10 +120,11 @@ defmodule Contextual do
             {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(42)
-            :error
+            {:error, :not_found}
 
         """
-        @spec unquote(name)(Ecto.Queryable.t(), term) :: {:ok, unquote(@__schema__).t()} | :error
+        @spec unquote(name)(Ecto.Queryable.t(), term) ::
+                {:ok, unquote(@__schema__).t()} | {:error, :not_found}
         def unquote(name)(queryable \\ @__schema__, id) do
           Contextual.API.fetch(@__repo__, queryable, id)
         end
@@ -135,7 +136,7 @@ defmodule Contextual do
 
         Returns `{:ok, record}` if the record is found.
 
-        Returns `:error` if the record does not exist.
+        Returns `{:error, :not_found}` if the record does not exist.
 
         ## Examples
 
@@ -143,11 +144,11 @@ defmodule Contextual do
             {:ok, %#{inspect(@__schema__)}{}}
 
             iex> #{name}(title: "Baloney")
-            :error
+            {:error, :not_found}
 
         """
         @spec unquote(name)(Ecto.Queryable.t(), list()) ::
-                {:ok, unquote(@__schema__).t()} | :error
+                {:ok, unquote(@__schema__).t()} | {:error, :not_found}
         def unquote(name)(queryable \\ @__schema__, clauses) do
           Contextual.API.fetch_by(@__repo__, queryable, clauses)
         end

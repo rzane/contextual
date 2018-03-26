@@ -24,7 +24,7 @@ defmodule Contextual.API do
   def fetch(repo, queryable, id) do
     case repo.get(queryable, id) do
       nil ->
-        :error
+        {:error, :not_found}
 
       resource ->
         {:ok, resource}
@@ -34,7 +34,7 @@ defmodule Contextual.API do
   def fetch_by(repo, queryable, clauses) do
     case repo.get_by(queryable, clauses) do
       nil ->
-        :error
+        {:error, :not_found}
 
       resource ->
         {:ok, resource}
